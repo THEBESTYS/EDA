@@ -22,6 +22,7 @@
             padding: 30px;
             position: relative;
             min-height: 100vh;
+            page-break-inside: avoid; /* 프린트 시 페이지 나눔 방지 */
         }
         
         .certificate-border {
@@ -114,6 +115,9 @@
         .print-actions {
             text-align: center;
             margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
         
         .btn {
@@ -145,9 +149,19 @@
             color: white;
         }
         
-        .btn:hover {
+        .settings-btn {
+            background: #9f7aea;
+            color: white;
+        }
+        
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
         .error-message {
@@ -161,21 +175,139 @@
             margin-bottom: 20px;
         }
         
+        .loading-message {
+            text-align: center;
+            padding: 50px;
+            color: #4c51bf;
+        }
+        
+        /* 프린트 최적화 스타일 */
         @media print {
-            .print-actions {
-                display: none;
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+            }
+            
+            .certificate-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                width: 100% !important;
+                height: auto !important;
             }
             
             .certificate-paper {
-                border: none;
-                padding: 0;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                min-height: auto !important;
+                width: 100% !important;
+                height: auto !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
             }
             
-            body {
-                background: white;
+            .certificate-border {
+                border: 1px solid #1a365d !important;
+                padding: 20px !important;
+                width: 100% !important;
+                height: auto !important;
+            }
+            
+            .print-actions,
+            .btn,
+            .no-print {
+                display: none !important;
+            }
+            
+            /* 페이지 설정 */
+            @page {
+                margin: 15mm;
+                size: A4 portrait;
+            }
+            
+            /* 폰트 및 크기 최적화 */
+            .certificate-title {
+                font-size: 24pt !important;
+                margin-bottom: 5pt !important;
+            }
+            
+            .certificate-subtitle {
+                font-size: 12pt !important;
+            }
+            
+            .student-name {
+                font-size: 20pt !important;
+                margin: 20pt 0 !important;
+                padding: 15pt !important;
+                background: #f8f9fa !important;
+            }
+            
+            .certificate-body p {
+                font-size: 12pt !important;
+                line-height: 1.4 !important;
+            }
+            
+            .details-table {
+                font-size: 11pt !important;
+                margin: 15pt 0 !important;
+            }
+            
+            .details-table td {
+                padding: 8px 10px !important;
+            }
+            
+            .estimated-scores {
+                background: #f0f8ff !important;
+                border: 1px solid #cce5ff !important;
+                margin: 15pt 0 !important;
+                padding: 15pt !important;
+            }
+            
+            .estimated-scores h4 {
+                font-size: 13pt !important;
+                margin-bottom: 10pt !important;
+            }
+            
+            .score-item {
+                font-size: 11pt !important;
+                padding-bottom: 8pt !important;
+                margin-bottom: 8pt !important;
+            }
+            
+            .certificate-footer {
+                font-size: 10pt !important;
+                margin-top: 30pt !important;
+            }
+            
+            /* 색상 최적화 */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            /* 링크 숨기기 */
+            a[href]:after {
+                content: "" !important;
+            }
+            
+            /* 페이지 나눔 제어 */
+            h1, h2, h3, h4, h5, h6 {
+                page-break-after: avoid !important;
+            }
+            
+            table, figure, img {
+                page-break-inside: avoid !important;
             }
         }
         
+        /* 반응형 디자인 */
         @media (max-width: 768px) {
             .certificate-container {
                 padding: 10px;
@@ -194,12 +326,80 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                padding: 15px;
             }
             
             .btn {
                 width: 100%;
                 margin: 5px 0;
             }
+            
+            .certificate-title {
+                font-size: 22px;
+            }
+            
+            .student-name {
+                font-size: 22px;
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .certificate-title {
+                font-size: 20px;
+            }
+            
+            .student-name {
+                font-size: 20px;
+            }
+            
+            .details-table {
+                font-size: 14px;
+            }
+            
+            .details-table td {
+                padding: 8px;
+                display: block;
+                width: 100%;
+                border-bottom: none;
+            }
+            
+            .details-table tr {
+                display: block;
+                margin-bottom: 15px;
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 15px;
+            }
+            
+            .details-table .label {
+                font-size: 12px;
+                color: #718096;
+                margin-bottom: 5px;
+            }
+            
+            .details-table tr:last-child {
+                border-bottom: none;
+            }
+        }
+        
+        /* 애니메이션 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease;
         }
     </style>
 </head>
@@ -220,10 +420,9 @@
                 
                 <!-- 인증서 본문 -->
                 <div class="certificate-body" id="certificateBody">
-                    <!-- 동적으로 내용이 로드됩니다 -->
-                    <div id="loadingMessage" style="text-align: center; padding: 50px;">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #4c51bf;"></i>
-                        <p style="margin-top: 20px; color: #4a5568;">Loading certificate...</p>
+                    <div id="loadingMessage" class="loading-message">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 40px;"></i>
+                        <p style="margin-top: 20px;">Loading certificate...</p>
                     </div>
                 </div>
             </div>
@@ -231,19 +430,22 @@
         
         <!-- 인쇄/다운로드 버튼 -->
         <div class="print-actions" id="printActions" style="display: none;">
-            <button class="btn print-btn" onclick="window.print()">
+            <button class="btn print-btn" onclick="optimizedPrint()">
                 <i class="fas fa-print"></i> Print Certificate
             </button>
-            <button class="btn download-btn" onclick="downloadPDF()">
-                <i class="fas fa-download"></i> Download PDF
+            <button class="btn download-btn" onclick="saveAsPDF()">
+                <i class="fas fa-download"></i> Save as PDF
             </button>
             <button class="btn back-btn" onclick="window.location.href='index.html'">
                 <i class="fas fa-arrow-left"></i> Back to Home
             </button>
+            <button class="btn settings-btn" onclick="openPrintSettings()">
+                <i class="fas fa-cog"></i> Print Settings
+            </button>
         </div>
     </div>
 
-    <!-- 인증서 템플릿 (숨김) -->
+    <!-- 인증서 템플릿 -->
     <template id="certificateTemplate">
         <p style="font-size: 16px; line-height: 1.6; text-align: center;">
             This is to certify that
@@ -364,12 +566,268 @@
             <div style="margin-top: 30px; font-size: 11px; color: #718096;">
                 <p>This certificate is valid for 2 years from the date of issue.</p>
                 <p>Certificate ID: <span id="displayCertIdFooter">ED-2024-00123-ABC</span></p>
-                <p>&copy; 2024 AI English Academy. All rights reserved.</p>
+                <p>&copy; <span class="current-year">2024</span> AI English Academy. All rights reserved.</p>
             </div>
         </div>
     </template>
 
-    <!-- JavaScript 파일 연결 -->
-    <script src="js/certificate.js"></script>
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script>
+        // ED 데이터 매핑
+        const ED_TO_CEFR = {
+            'Pre-Basic': 'A1', 'Basic 3': 'A1', 'Basic 2': 'A2',
+            'Basic 1': 'A2', 'Intermediate 1': 'B1', 'Intermediate 2': 'B1',
+            'Intermediate 3': 'B1', 'Advanced 1': 'B2', 'Advanced 2': 'C1',
+            'Advanced 3': 'C2'
+        };
+        
+        const CEFR_DESCRIPTIONS = {
+            'A1': 'Beginner', 'A2': 'Elementary', 'B1': 'Intermediate',
+            'B2': 'Upper Intermediate', 'C1': 'Advanced', 'C2': 'Proficient'
+        };
+        
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCertificate();
+            initializePrintFunctions();
+        });
+        
+        // 인증서 로드
+        function loadCertificate() {
+            try {
+                const certificate = getCertificateFromURL();
+                
+                if (certificate) {
+                    displayCertificate(certificate);
+                    document.getElementById('printActions').style.display = 'block';
+                } else {
+                    showError('Certificate data not found');
+                }
+            } catch (error) {
+                console.error('Error loading certificate:', error);
+                showError('Failed to load certificate');
+            }
+        }
+        
+        // URL에서 인증서 데이터 가져오기
+        function getCertificateFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            
+            if (!dataParam) {
+                // 로컬스토리지에서 마지막 인증서 가져오기
+                const lastCertificate = localStorage.getItem('last_issued_certificate');
+                if (lastCertificate) {
+                    try {
+                        return JSON.parse(lastCertificate);
+                    } catch (e) {
+                        console.error('Error parsing stored certificate:', e);
+                    }
+                }
+                return null;
+            }
+            
+            try {
+                return JSON.parse(decodeURIComponent(dataParam));
+            } catch (error) {
+                console.error('Error parsing URL data:', error);
+                return null;
+            }
+        }
+        
+        // 인증서 표시
+        function displayCertificate(certificate) {
+            document.getElementById('loadingMessage').style.display = 'none';
+            
+            const body = document.getElementById('certificateBody');
+            const bodyTemplate = document.getElementById('certificateTemplate');
+            const footerTemplate = document.getElementById('footerTemplate');
+            
+            if (bodyTemplate) {
+                body.appendChild(bodyTemplate.content.cloneNode(true));
+            }
+            if (footerTemplate) {
+                body.appendChild(footerTemplate.content.cloneNode(true));
+            }
+            
+            fillCertificateData(certificate);
+            
+            // 애니메이션 적용
+            body.classList.add('fade-in');
+        }
+        
+        // 데이터 채우기
+        function fillCertificateData(cert) {
+            // 학생 정보
+            if (cert.student) {
+                document.getElementById('displayStudentName').textContent = 
+                    `${cert.student.lastName}, ${cert.student.firstName}`;
+                document.getElementById('displayBirthDate').textContent = 
+                    formatDate(cert.student.birthDate);
+            }
+            
+            // 성취 정보
+            if (cert.achievement) {
+                document.getElementById('displayEdLevel').textContent = cert.achievement.edLevel;
+                document.getElementById('displayCefrLevel').textContent = 
+                    `${cert.achievement.cefrLevel} (${CEFR_DESCRIPTIONS[cert.achievement.cefrLevel] || ''})`;
+                document.getElementById('displayCompletionDate').textContent = 
+                    formatDate(cert.achievement.completionDate);
+                document.getElementById('displayIssueDate').textContent = 
+                    formatDate(cert.achievement.issueDate);
+            }
+            
+            // ID와 점수
+            if (cert.id) {
+                document.getElementById('displayCertId').textContent = cert.id;
+                document.getElementById('displayCertIdFooter').textContent = cert.id;
+                document.getElementById('displayVerifyUrl').textContent = 
+                    cert.verificationUrl || `verify.ed-english.com/${cert.id}`;
+            }
+            
+            if (cert.estimatedScores) {
+                document.getElementById('displayToefl').textContent = 
+                    cert.estimatedScores.toefl ? `${cert.estimatedScores.toefl} points` : 'N/A';
+                document.getElementById('displayToeic').textContent = 
+                    cert.estimatedScores.toeic ? `${cert.estimatedScores.toeic} points` : 'N/A';
+                document.getElementById('displayIelts').textContent = 
+                    cert.estimatedScores.ielts ? `${cert.estimatedScores.ielts} bands` : 'N/A';
+            }
+            
+            // 현재 연도 업데이트
+            const yearElements = document.querySelectorAll('.current-year');
+            const currentYear = new Date().getFullYear();
+            yearElements.forEach(el => {
+                el.textContent = currentYear;
+            });
+        }
+        
+        // 날짜 포맷팅
+        function formatDate(dateString) {
+            if (!dateString || dateString === 'N/A') return 'N/A';
+            
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return 'Invalid Date';
+                
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                console.error('Date formatting error:', e);
+                return 'N/A';
+            }
+        }
+        
+        // 에러 표시
+        function showError(message) {
+            const body = document.getElementById('certificateBody');
+            body.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Certificate Error</h3>
+                    <p>${message}</p>
+                    <button class="btn back-btn" onclick="window.location.href='index.html'" style="margin-top: 20px;">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </button>
+                </div>
+            `;
+        }
+        
+        // 프린트 함수 초기화
+        function initializePrintFunctions() {
+            // 프린트 버튼 이벤트 업데이트
+            const printBtn = document.querySelector('.print-btn');
+            if (printBtn) {
+                printBtn.addEventListener('click', optimizedPrint);
+            }
+        }
+        
+        // 최적화된 프린트 기능
+        function optimizedPrint() {
+            // 프린트 준비 알림
+            showToast('Preparing for print...', 'info');
+            
+            // 프린트 다이얼로그 열기
+            setTimeout(() => {
+                window.print();
+                
+                // 프린트 후 알림
+                setTimeout(() => {
+                    showToast('Print dialog opened', 'success');
+                }, 500);
+            }, 500);
+        }
+        
+        // PDF 저장
+        function saveAsPDF() {
+            showToast('Please use "Print" → "Save as PDF" in print dialog', 'info');
+            
+            // 프린트 다이얼로그 열기 (PDF 저장 옵션)
+            setTimeout(() => {
+                window.print();
+            }, 1000);
+        }
+        
+        // 프린트 설정
+        function openPrintSettings() {
+            alert('Print Settings:\n\n' +
+                  '1. Click "Print Certificate"\n' +
+                  '2. In print dialog, select:\n' +
+                  '   • Destination: "Save as PDF"\n' +
+                  '   • Paper size: A4\n' +
+                  '   • Margins: Default\n' +
+                  '3. Click "Save" to download PDF');
+        }
+        
+        // 토스트 메시지
+        function showToast(message, type = 'info') {
+            // 기존 토스트 제거
+            const existing = document.getElementById('cert-toast');
+            if (existing) existing.remove();
+            
+            // 색상 설정
+            const colors = {
+                info: '#3182ce',
+                success: '#38a169',
+                error: '#e53e3e',
+                warning: '#d69e2e'
+            };
+            
+            // 새 토스트 생성
+            const toast = document.createElement('div');
+            toast.id = 'cert-toast';
+            toast.textContent = message;
+            
+            Object.assign(toast.style, {
+                position: 'fixed',
+                bottom: '20px',
+                right: '20px',
+                padding: '12px 24px',
+                background: colors[type] || colors.info,
+                color: 'white',
+                borderRadius: '8px',
+                zIndex: '9999',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                animation: 'slideIn 0.3s ease'
+            });
+            
+            document.body.appendChild(toast);
+            
+            // 3초 후 제거
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // 전역 함수 내보내기
+        window.optimizedPrint = optimizedPrint;
+        window.saveAsPDF = saveAsPDF;
+        window.openPrintSettings = openPrintSettings;
+    </script>
 </body>
 </html>
