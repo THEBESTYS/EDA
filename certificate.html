@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Proficiency Certificate</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 인증서 특별 스타일 */
+        .certificate-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .certificate-paper {
+            background: white;
+            border: 15px solid #f0e6d2;
+            padding: 30px;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .certificate-border {
+            border: 2px solid #1a365d;
+            padding: 25px;
+            height: 100%;
+        }
+        
+        .certificate-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1a365d;
+        }
+        
+        .certificate-title {
+            font-size: 28px;
+            color: #1a365d;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .certificate-subtitle {
+            color: #4a5568;
+            font-size: 16px;
+        }
+        
+        .student-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d3748;
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        
+        .certificate-body {
+            margin: 30px 0;
+        }
+        
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+        
+        .details-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .details-table .label {
+            font-weight: bold;
+            color: #4a5568;
+            width: 40%;
+        }
+        
+        .estimated-scores {
+            background: #ebf8ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #bee3f8;
+        }
+        
+        .score-item:last-child {
+            border-bottom: none;
+        }
+        
+        .certificate-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .print-actions {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        @media print {
+            .print-actions {
+                display: none;
+            }
+            
+            .certificate-paper {
+                border: none;
+                padding: 0;
+            }
+            
+            body {
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <div class="certificate-paper">
+            <div class="certificate-border">
+                <!-- 인증서 헤더 -->
+                <div class="certificate-header">
+                    <div class="certificate-title">
+                        <i class="fas fa-globe-americas"></i>
+                        ENGLISH PROFICIENCY CERTIFICATE
+                    </div>
+                    <div class="certificate-subtitle">
+                        Based on ETS English Discoveries & CEFR International Standards
+                    </div>
+                </div>
+                
+                <!-- 인증서 본문 -->
+                <div class="certificate-body">
+                    <p style="font-size: 16px; line-height: 1.6; text-align: center;">
+                        This is to certify that
+                    </p>
+                    
+                    <div class="student-name" id="displayStudentName">
+                        HONG, GILDONG
+                    </div>
+                    
+                    <p style="font-size: 16px; line-height: 1.6; text-align: center; margin-bottom: 30px;">
+                        has successfully completed the English Discoveries program 
+                        and has demonstrated English language proficiency 
+                        equivalent to the level indicated below.
+                    </p>
+                    
+                    <!-- 상세 정보 테이블 -->
+                    <table class="details-table">
+                        <tr>
+                            <td class="label">Certificate ID:</td>
+                            <td id="displayCertId">ED-2024-00123-ABC</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Date of Issue:</td>
+                            <td id="displayIssueDate">January 15, 2024</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Date of Birth:</td>
+                            <td id="displayBirthDate">January 1, 1990</td>
+                        </tr>
+                        <tr>
+                            <td class="label">English Discoveries Level:</td>
+                            <td id="displayEdLevel">Intermediate 2</td>
+                        </tr>
+                        <tr>
+                            <td class="label">CEFR Equivalent:</td>
+                            <td id="displayCefrLevel">B1 (Intermediate)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Completion Date:</td>
+                            <td id="displayCompletionDate">December 30, 2023</td>
+                        </tr>
+                    </table>
+                    
+                    <!-- 추정 점수 -->
+                    <div class="estimated-scores">
+                        <h4 style="color: #2d3748; margin-bottom: 15px;">
+                            <i class="fas fa-chart-line"></i> Estimated Score Ranges (Reference Only)
+                        </h4>
+                        
+                        <div class="score-item">
+                            <span>TOEFL iBT:</span>
+                            <strong id="displayToefl">42-71 points</strong>
+                        </div>
+                        
+                        <div class="score-item">
+                            <span>TOEIC:</span>
+                            <strong id="displayToeic">550-784 points</strong>
+                        </div>
+                        
+                        <div class="score-item">
+                            <span>IELTS:</span>
+                            <strong id="displayIelts">4.0-5.0 bands</strong>
+                        </div>
+                        
+                        <p style="font-size: 12px; color: #718096; margin-top: 15px; font-style: italic;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            These are estimated score ranges based on CEFR level equivalence. 
+                            They are not official test scores and should be used for reference purposes only.
+                        </p>
+                    </div>
+                    
+                    <!-- 인증 근거 -->
+                    <div style="background: #f7fafc; padding: 20px; border-radius: 8px; margin-top: 25px;">
+                        <h4 style="color: #2d3748; margin-bottom: 10px;">
+                            <i class="fas fa-file-contract"></i> Certification Basis
+                        </h4>
+                        <ul style="color: #4a5568; line-height: 1.6;">
+                            <li>English Discoveries program completion verification</li>
+                            <li>Official ETS English Discoveries to CEFR mapping</li>
+                            <li>CEFR to standardized test score correlation (reference)</li>
+                            <li>Unique certificate identifier with online verification</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 인증서 푸터 -->
+                <div class="certificate-footer">
+                    <div style="margin-bottom: 20px;">
+                        <div id="displayQrCode" style="width: 100px; height: 100px; margin: 0 auto 15px; 
+                             background: #f7fafc; display: flex; align-items: center; justify-content: center;
+                             border: 1px solid #e2e8f0;">
+                            <span style="font-size: 10px; color: #718096;">QR Code</span>
+                        </div>
+                        <div style="font-family: monospace; font-size: 12px; color: #4a5568;">
+                            Verification: <span id="displayVerifyUrl">verify.ed-english.com/ED-2024-00123-ABC</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 40px;">
+                        <div style="text-align: left; width: 45%;">
+                            <div style="border-top: 1px solid #1a365d; padding-top: 10px;">
+                                <div style="font-weight: bold; color: #1a365d;">Issuing Authority</div>
+                                <div>AI English Academy</div>
+                                <div>Official ED Partner</div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: right; width: 45%;">
+                            <div style="border-top: 1px solid #1a365d; padding-top: 10px;">
+                                <div style="font-weight: bold; color: #1a365d;">Recognition</div>
+                                <div>ETS English Discoveries</div>
+                                <div>CEFR International Standard</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; font-size: 11px; color: #718096;">
+                        <p>This certificate is valid for 2 years from the date of issue.</p>
+                        <p>Certificate ID: <span id="displayCertIdFooter">ED-2024-00123-ABC</span></p>
+                        <p>&copy; 2024 AI English Academy. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 인쇄/다운로드 버튼 -->
+        <div class="print-actions">
+            <button class="btn print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Certificate
+            </button>
+            <button class="btn download-btn" onclick="downloadPDF()">
+                <i class="fas fa-download"></i> Download PDF
+            </button>
+            <button class="btn back-btn" onclick="window.location.href='index.html'">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // URL에서 인증서 데이터 가져오기
+        function loadCertificateFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const certData = urlParams.get('data');
+            
+            if (certData) {
+                try {
+                    const certificate = JSON.parse(decodeURIComponent(certData));
+                    displayCertificate(certificate);
+                } catch (e) {
+                    console.error('Error parsing certificate data:', e);
+                }
+            }
+        }
+        
+        function displayCertificate(cert) {
+            // 데이터 표시
+            if (cert.student) {
+                document.getElementById('displayStudentName').textContent = 
+                    `${cert.student.lastName}, ${cert.student.firstName}`;
+                document.getElementById('displayBirthDate').textContent = 
+                    formatDate(cert.student.birthDate);
+            }
+            
+            if (cert.achievement) {
+                document.getElementById('displayEdLevel').textContent = cert.achievement.edLevel;
+                document.getElementById('displayCefrLevel').textContent = cert.achievement.cefrLevel;
+                document.getElementById('displayCompletionDate').textContent = 
+                    formatDate(cert.achievement.completionDate);
+                document.getElementById('displayIssueDate').textContent = 
+                    formatDate(cert.achievement.issueDate);
+            }
+            
+            if (cert.id) {
+                document.getElementById('displayCertId').textContent = cert.id;
+                document.getElementById('displayCertIdFooter').textContent = cert.id;
+                document.getElementById('displayVerifyUrl').textContent = 
+                    `verify.ed-english.com/${cert.id}`;
+            }
+            
+            if (cert.estimatedScores) {
+                document.getElementById('displayToefl').textContent = 
+                    cert.estimatedScores.toefl || 'N/A';
+                document.getElementById('displayToeic').textContent = 
+                    cert.estimatedScores.toeic || 'N/A';
+                document.getElementById('displayIelts').textContent = 
+                    cert.estimatedScores.ielts || 'N/A';
+            }
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        function downloadPDF() {
+            alert('PDF download will be available in the next version.');
+            // 실제 구현에서는 jsPDF 라이브러리 사용
+        }
+        
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCertificateFromURL();
+        });
+    </script>
+</body>
+</html>
