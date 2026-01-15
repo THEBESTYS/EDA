@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Certificate - ED Global</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-globe-americas"></i>
+                <h1>ED Certificate Verification</h1>
+            </div>
+            <nav>
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="verify.html" class="active"><i class="fas fa-search"></i> Verify</a>
+            </nav>
+        </header>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="main-content">
+            <section class="verify-section">
+                <h2><i class="fas fa-search"></i> Verify a Certificate</h2>
+                <p class="section-description">
+                    Enter the Certificate ID to verify its authenticity and view details.
+                </p>
+                
+                <div class="verify-form">
+                    <div class="form-group">
+                        <label for="certificateId">
+                            <i class="fas fa-qrcode"></i> Certificate ID
+                        </label>
+                        <input type="text" id="certificateId" 
+                               placeholder="e.g., ED-2024-00123-ABC" 
+                               class="certificate-input">
+                        <button class="btn scan-btn">
+                            <i class="fas fa-camera"></i> Scan QR
+                        </button>
+                    </div>
+                    
+                    <button class="btn verify-btn" onclick="verifyCertificate()">
+                        <i class="fas fa-search"></i> Verify Now
+                    </button>
+                </div>
+                
+                <!-- 검증 결과 -->
+                <div class="verify-result" id="verifyResult">
+                    <div class="result-placeholder">
+                        <i class="fas fa-certificate"></i>
+                        <p>Enter a Certificate ID above to verify</p>
+                    </div>
+                </div>
+                
+                <!-- 샘플 인증서 ID -->
+                <div class="sample-ids">
+                    <h4><i class="fas fa-lightbulb"></i> Sample Certificate IDs (for testing)</h4>
+                    <div class="sample-list">
+                        <button class="sample-id" onclick="useSampleId('ED-2024-00123-ABC')">
+                            ED-2024-00123-ABC
+                        </button>
+                        <button class="sample-id" onclick="useSampleId('ED-2024-00234-DEF')">
+                            ED-2024-00234-DEF
+                        </button>
+                        <button class="sample-id" onclick="useSampleId('ED-2024-00345-GHI')">
+                            ED-2024-00345-GHI
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 인증서 정보 설명 -->
+            <section class="info-section">
+                <h3><i class="fas fa-info-circle"></i> About Certificate Verification</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Secure Verification</h4>
+                        <p>All certificates are securely stored and can be verified online in real-time.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <i class="fas fa-globe"></i>
+                        <h4>Global Recognition</h4>
+                        <p>Certificates are based on internationally recognized CEFR standards.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <i class="fas fa-clock"></i>
+                        <h4>Valid for 2 Years</h4>
+                        <p>Certificates are valid for 2 years from the date of issue.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Important Notice</h4>
+                        <p>This certificate verifies ED completion, not official test scores.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-question-circle"></i> Need Help?</h4>
+                    <p>Contact support at: support@ed-english.com</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4><i class="fas fa-balance-scale"></i> Legal</h4>
+                    <p>English Discoveries is a product of Edusoft Ltd., a subsidiary of ETS.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 AI English Academy. English Discoveries &reg; is a registered trademark of Edusoft Ltd.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
