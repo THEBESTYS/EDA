@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ED Global English Certificate</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-globe-americas"></i>
+                <h1>ED Global Certificate</h1>
+            </div>
+            <nav>
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="verify.html"><i class="fas fa-search"></i> Verify</a>
+            </nav>
+        </header>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="main-content">
+            <section class="hero">
+                <h2>Global English Proficiency Certificate</h2>
+                <p class="subtitle">Officially recognized English level certification based on ETS English Discoveries</p>
+                <div class="badges">
+                    <span class="badge"><i class="fas fa-check-circle"></i> ETS Verified</span>
+                    <span class="badge"><i class="fas fa-check-circle"></i> CEFR Aligned</span>
+                    <span class="badge"><i class="fas fa-check-circle"></i> Global Standard</span>
+                </div>
+            </section>
+
+            <!-- 인증서 발급 폼 -->
+            <section class="issue-form">
+                <h3><i class="fas fa-file-certificate"></i> Issue Your Certificate</h3>
+                
+                <!-- 진행 단계 표시 -->
+                <div class="progress-steps">
+                    <div class="step active" data-step="1">
+                        <span class="step-number">1</span>
+                        <span class="step-text">Personal Info</span>
+                    </div>
+                    <div class="step" data-step="2">
+                        <span class="step-number">2</span>
+                        <span class="step-text">ED Level</span>
+                    </div>
+                    <div class="step" data-step="3">
+                        <span class="step-number">3</span>
+                        <span class="step-text">Review & Issue</span>
+                    </div>
+                </div>
+
+                <!-- 단계 1: 개인정보 -->
+                <div class="form-step active" id="step1">
+                    <div class="form-group">
+                        <label for="firstName">
+                            <i class="fas fa-user"></i> First Name (as in passport)
+                        </label>
+                        <input type="text" id="firstName" placeholder="GILDONG" required>
+                        <small>Please use uppercase letters as shown in your passport</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName">
+                            <i class="fas fa-user"></i> Last Name (as in passport)
+                        </label>
+                        <input type="text" id="lastName" placeholder="HONG" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="birthDate">
+                            <i class="fas fa-birthday-cake"></i> Date of Birth
+                        </label>
+                        <input type="date" id="birthDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email" id="email" placeholder="your.email@example.com" required>
+                    </div>
+                    
+                    <button class="btn next-btn" onclick="nextStep(2)">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- 단계 2: ED 레벨 -->
+                <div class="form-step" id="step2">
+                    <div class="form-group">
+                        <label for="edLevel">
+                            <i class="fas fa-graduation-cap"></i> English Discoveries Level
+                        </label>
+                        <select id="edLevel" required onchange="updateCEFR()">
+                            <option value="">Select your ED level</option>
+                            <option value="Pre-Basic">Pre-Basic (CEFR: A1)</option>
+                            <option value="Basic 3">Basic 3 (CEFR: A1)</option>
+                            <option value="Basic 2">Basic 2 (CEFR: A2)</option>
+                            <option value="Basic 1">Basic 1 (CEFR: A2)</option>
+                            <option value="Intermediate 1">Intermediate 1 (CEFR: B1)</option>
+                            <option value="Intermediate 2">Intermediate 2 (CEFR: B1)</option>
+                            <option value="Intermediate 3">Intermediate 3 (CEFR: B1)</option>
+                            <option value="Advanced 1">Advanced 1 (CEFR: B2)</option>
+                            <option value="Advanced 2">Advanced 2 (CEFR: C1)</option>
+                            <option value="Advanced 3">Advanced 3 (CEFR: C2)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>CEFR Level:</strong> <span id="cefrLevelDisplay">-</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="completionDate">
+                            <i class="fas fa-calendar-check"></i> Completion Date
+                        </label>
+                        <input type="date" id="completionDate" required>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn prev-btn" onclick="prevStep(1)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="btn next-btn" onclick="nextStep(3)">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 단계 3: 검토 및 발급 -->
+                <div class="form-step" id="step3">
+                    <div class="review-section">
+                        <h4><i class="fas fa-user-check"></i> Personal Information</h4>
+                        <div class="review-item">
+                            <strong>Name:</strong> <span id="reviewName">-</span>
+                        </div>
+                        <div class="review-item">
+                            <strong>Date of Birth:</strong> <span id="reviewBirth">-</span>
+                        </div>
+                        <div class="review-item">
+                            <strong>Email:</strong> <span id="reviewEmail">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="review-section">
+                        <h4><i class="fas fa-award"></i> Achievement</h4>
+                        <div class="review-item">
+                            <strong>ED Level:</strong> <span id="reviewEdLevel">-</span>
+                        </div>
+                        <div class="review-item">
+                            <strong>CEFR Level:</strong> <span id="reviewCefrLevel">-</span>
+                        </div>
+                        <div class="review-item">
+                            <strong>Completion Date:</strong> <span id="reviewCompletion">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="review-section">
+                        <h4><i class="fas fa-chart-bar"></i> Estimated Score Ranges (Reference)</h4>
+                        <div class="review-item">
+                            <strong>TOEFL iBT:</strong> <span id="reviewToefl">-</span>
+                        </div>
+                        <div class="review-item">
+                            <strong>TOEIC:</strong> <span id="reviewToeic">-</span>
+                        </div>
+                        <div class="review-item">
+                            <strong>IELTS:</strong> <span id="reviewIelts">-</span>
+                        </div>
+                        <p class="disclaimer">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            These are estimated ranges based on CEFR level, not actual test scores.
+                        </p>
+                    </div>
+                    
+                    <div class="terms-agreement">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <label for="agreeTerms">
+                            I understand that this certificate verifies my ED completion and CEFR equivalence. 
+                            It is not an official TOEFL/TOEIC test score.
+                        </label>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn prev-btn" onclick="prevStep(2)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                        <button class="btn issue-btn" onclick="issueCertificate()">
+                            <i class="fas fa-file-certificate"></i> Issue Certificate
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4><i class="fas fa-info-circle"></i> About</h4>
+                    <p>This system issues globally recognized English proficiency certificates based on ETS English Discoveries and CEFR standards.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4><i class="fas fa-shield-alt"></i> Official Recognition</h4>
+                    <p>ED to CEFR mapping is officially recognized by ETS and Edusoft.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 AI English Academy. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 성공 모달 -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-check-circle success"></i> Certificate Issued!</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Your Global English Proficiency Certificate has been successfully issued.</p>
+                
+                <div class="certificate-id">
+                    <strong>Certificate ID:</strong>
+                    <code id="certIdDisplay">ED-XXXX-XXXX-XXXX</code>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn view-btn" onclick="viewCertificate()">
+                        <i class="fas fa-eye"></i> View Certificate
+                    </button>
+                    <button class="btn copy-btn" onclick="copyCertificateId()">
+                        <i class="fas fa-copy"></i> Copy ID
+                    </button>
+                </div>
+                
+                <p class="modal-note">
+                    <i class="fas fa-link"></i>
+                    Verify URL: <span id="verifyUrl" class="url">https://verify.ed-english.com/</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
