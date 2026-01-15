@@ -549,6 +549,8 @@ function updateReviewData() {
 
 // ==================== 인증서 발급 함수 ====================
 
+// js/main.js에서 issueCertificate 함수를 다음으로 교체하세요:
+
 /**
  * 인증서 발급
  */
@@ -561,28 +563,30 @@ function issueCertificate() {
     }
     
     try {
-        // 폼 데이터 수집
+        // 1. 폼 데이터 수집
         const formData = collectFormData();
         
-        // 필수 필드 확인
+        // 2. 필수 필드 확인
         if (!formData.firstName || !formData.lastName || !formData.birthDate || !formData.edLevel) {
+            // URL에서 데이터 가져오기 시도
+            const urlCertificate = getCertificateFromCurrentURL();
+            if (urlCertificate) {
+                return processURLCertificate(urlCertificate);
+            }
+            
             alert('Please fill in all required fields.');
             return;
         }
         
-        // 인증서 생성
+        // 3. 인증서 생성
         const certificate = createCertificate(formData);
         
-        // 로컬스토리지에 저장
+        // 4. 로컬스토리지에 저장
         const success = saveCertificate(certificate);
         
         if (success) {
-            // 성공 모달 표시
-            showCertificateSuccess(certificate);
-            
-            // URL에 인증서 데이터 추가
-            const urlData = createCertificateUrl(certificate);
-            history.replaceState(null, '', `?data=${urlData}`);
+            // 5. 인증서 페이지로 이동
+            redirectToCertificatePage(certificate);
         } else {
             alert('Failed to save certificate. Please try again.');
         }
@@ -593,47 +597,88 @@ function issueCertificate() {
 }
 
 /**
- * 인증서 발급 성공 모달 표시
+ * 현재 URL에서 인증서 데이터 가져오기
  */
-function showCertificateSuccess(certificate) {
-    // 모달 요소 가져오기
-    const modal = document.getElementById('successModal');
-    const certIdElement = document.getElementById('issuedCertId');
-    const certUrlElement = document.getElementById('certificateUrl');
+function getCertificateFromCurrentURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataParam = urlParams.get('data');
     
-    if (modal && certIdElement && certUrlElement) {
-        // 데이터 설정
-        certIdElement.textContent = certificate.id;
-        certUrlElement.textContent = `https://verify.ed-english.com/${certificate.id}`;
+    if (!dataParam) return null;
+    
+    try {
+        const urlData = JSON.parse(decodeURIComponent(dataParam));
         
-        // 모달 표시
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        // URL 데이터를 완전한 인증서 객체로 변환
+        return {
+            id: urlData.id || generateCertificateId(),
+            student: {
+                firstName: urlData.fn || '',
+                lastName: urlData.ln || '',
+                birthDate: '', // URL에는 생년월일이 없을 수 있음
+                email: ''
+            },
+            achievement: {
+                edLevel: urlData.lvl || '',
+                cefrLevel: getCEFRByEdLevel(urlData.lvl),
+                completionDate: getTodayDate(),
+                issueDate: getTodayDate()
+            },
+            estimatedScores: getScoresByCEFR(getCEFRByEdLevel(urlData.lvl))
+        };
+    } catch (error) {
+        console.error('Error parsing URL data:', error);
+        return null;
     }
 }
 
 /**
- * 인증서 보기
+ * URL 인증서 처리
+ */
+function processURLCertificate(certificate) {
+    // 1. 폼에서 추가 정보 수집 시도
+    const firstName = document.getElementById('firstName')?.value || certificate.student.firstName;
+    const lastName = document.getElementById('lastName')?.value || certificate.student.lastName;
+    const birthDate = document.getElementById('birthDate')?.value || '';
+    const email = document.getElementById('email')?.value || '';
+    
+    // 2. 인증서 정보 업데이트
+    certificate.student.firstName = toPassportCase(firstName);
+    certificate.student.lastName = toPassportCase(lastName);
+    certificate.student.birthDate = birthDate;
+    certificate.student.email = email;
+    
+    // 3. 로컬스토리지에 저장
+    const success = saveCertificate(certificate);
+    
+    if (success) {
+        // 4. 인증서 페이지로 이동
+        redirectToCertificatePage(certificate);
+    } else {
+        alert('Failed to save certificate. Please try again.');
+    }
+}
+
+/**
+ * 인증서 페이지로 리디렉션
+ */
+function redirectToCertificatePage(certificate) {
+    // 인증서 데이터를 URL에 인코딩
+    const certificateData = encodeURIComponent(JSON.stringify(certificate));
+    
+    // 인증서 페이지로 이동
+    window.location.href = `certificate.html?data=${certificateData}`;
+}
+
+/**
+ * 인증서 보기 (성공 모달용)
  */
 function viewCertificate() {
     const certIdElement = document.getElementById('issuedCertId');
-    if (certIdElement) {
+    if (certIdElement && certIdElement.textContent) {
         const certificate = findCertificateById(certIdElement.textContent);
         if (certificate) {
-            const urlData = encodeURIComponent(JSON.stringify(certificate));
-            window.open(`certificate.html?data=${urlData}`, '_blank');
+            redirectToCertificatePage(certificate);
         }
-    }
-}
-
-/**
- * 모달 닫기
- */
-function closeModal() {
-    const modal = document.getElementById('successModal');
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
     }
 }
 
