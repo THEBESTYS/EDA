@@ -84,17 +84,13 @@
                         </label>
                         <input type="email" id="email" placeholder="your.email@example.com" required>
                     </div>
-
-                    <!-- Step 1의 Next 버튼 -->
-                    <button class="btn next-btn" onclick="nextStep(2)">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
-
-                    <!-- Step 2의 Next 버튼 -->
-                    <button class="btn next-btn" onclick="nextStep(3)">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
                     
+                    <!-- Step 1의 Next 버튼 (오직 1개만) -->
+                    <div class="button-group">
+                        <button class="btn next-btn" onclick="nextStep(2)">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 단계 2: ED 레벨 -->
@@ -103,7 +99,7 @@
                         <label for="edLevel">
                             <i class="fas fa-graduation-cap"></i> English Discoveries Level
                         </label>
-                        <select id="edLevel" required onchange="updateCEFR()">
+                        <select id="edLevel" required>
                             <option value="">Select your ED level</option>
                             <option value="Pre-Basic">Pre-Basic (CEFR: A1)</option>
                             <option value="Basic 3">Basic 3 (CEFR: A1)</option>
@@ -129,6 +125,7 @@
                         <input type="date" id="completionDate" required>
                     </div>
                     
+                    <!-- Step 2의 버튼 (Back 1개, Next 1개) -->
                     <div class="button-group">
                         <button class="btn prev-btn" onclick="prevStep(1)">
                             <i class="fas fa-arrow-left"></i> Back
@@ -136,20 +133,6 @@
                         <button class="btn next-btn" onclick="nextStep(3)">
                             Next <i class="fas fa-arrow-right"></i>
                         </button>
-                        
-                        <!-- Step 2의 Back 버튼 -->
-                        <button class="btn back-btn" onclick="prevStep(1)">
-                            <i class="fas fa-arrow-left"></i> Back
-                        </button>
-
-                        <!-- Step 3의 Back 버튼 -->
-                        <button class="btn back-btn" onclick="prevStep(2)">
-                            <i class="fas fa-arrow-left"></i> Back
-                        </button>
-                        <button class="btn issue-btn" onclick="issueCertificate()">
-                            <i class="fas fa-file-certificate"></i> Issue Certificate
-                        </button>
-                        <button class="close-modal" onclick="closeModal()">&times;</button>
                     </div>
                 </div>
 
@@ -206,6 +189,7 @@
                         </label>
                     </div>
                     
+                    <!-- Step 3의 버튼 (Back 1개, Issue Certificate 1개) -->
                     <div class="button-group">
                         <button class="btn prev-btn" onclick="prevStep(2)">
                             <i class="fas fa-arrow-left"></i> Back
@@ -233,7 +217,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2024 AI English Academy. All rights reserved.</p>
+                <p>&copy; <span class="current-year">2024</span> AI English Academy. All rights reserved.</p>
             </div>
         </footer>
     </div>
@@ -250,7 +234,7 @@
                 
                 <div class="certificate-id">
                     <strong>Certificate ID:</strong>
-                    <code id="certIdDisplay">ED-XXXX-XXXX-XXXX</code>
+                    <code id="issuedCertId">ED-XXXX-XXXX-XXXX</code>
                 </div>
                 
                 <div class="modal-actions">
@@ -270,7 +254,66 @@
         </div>
     </div>
 
+    <!-- JavaScript 파일 연결 -->
     <script src="js/main.js"></script>
-    <script src="js/form.js"></script> 
+    <script>
+        // ED 레벨 선택 시 CEFR 업데이트
+        function updateCEFR() {
+            const edLevelSelect = document.getElementById('edLevel');
+            const cefrDisplay = document.getElementById('cefrLevelDisplay');
+            
+            if (edLevelSelect && cefrDisplay) {
+                const selectedValue = edLevelSelect.value;
+                const cefrLevel = window.CommonUtils?.getCEFRByEdLevel(selectedValue) || 
+                                 (() => {
+                                     const mapping = {
+                                         'Pre-Basic': 'A1', 'Basic 3': 'A1', 'Basic 2': 'A2',
+                                         'Basic 1': 'A2', 'Intermediate 1': 'B1', 'Intermediate 2': 'B1',
+                                         'Intermediate 3': 'B1', 'Advanced 1': 'B2', 'Advanced 2': 'C1',
+                                         'Advanced 3': 'C2'
+                                     };
+                                     return mapping[selectedValue] || '-';
+                                 })();
+                cefrDisplay.textContent = cefrLevel;
+            }
+        }
+        
+        // 인증서 ID 복사
+        function copyCertificateId() {
+            const certIdElement = document.getElementById('issuedCertId');
+            if (certIdElement) {
+                const certId = certIdElement.textContent;
+                if (window.CommonUtils?.copyToClipboard) {
+                    window.CommonUtils.copyToClipboard(certId);
+                } else {
+                    navigator.clipboard.writeText(certId).then(() => {
+                        alert('Certificate ID copied to clipboard!');
+                    });
+                }
+            }
+        }
+        
+        // 페이지 로드 시 ED 레벨 선택 이벤트 추가
+        document.addEventListener('DOMContentLoaded', function() {
+            const edLevelSelect = document.getElementById('edLevel');
+            if (edLevelSelect) {
+                edLevelSelect.addEventListener('change', updateCEFR);
+                
+                // 초기값 설정
+                updateCEFR();
+            }
+            
+            // 약관 동의 체크박스 이벤트
+            const agreeCheckbox = document.getElementById('agreeTerms');
+            if (agreeCheckbox) {
+                agreeCheckbox.addEventListener('change', function() {
+                    const issueButton = document.querySelector('.issue-btn');
+                    if (issueButton) {
+                        issueButton.disabled = !this.checked;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
