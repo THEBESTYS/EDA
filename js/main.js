@@ -410,40 +410,234 @@ function validateEdLevel() {
     };
 }
 
-// ==================== UI 관련 함수 ====================
+// ==================== 폼 단계 관리 함수 ====================
+
+/**
+ * 다음 단계로 이동
+ */
+function nextStep(stepNumber) {
+    // Step 1 → Step 2: 개인정보 유효성 검사
+    if (stepNumber === 2) {
+        const validation = validatePersonalInfo();
+        if (!validation.isValid) {
+            alert(validation.errors.join('\n'));
+            return;
+        }
+    }
+    
+    // Step 2 → Step 3: ED 레벨 유효성 검사 및 검토 데이터 업데이트
+    if (stepNumber === 3) {
+        const validation = validateEdLevel();
+        if (!validation.isValid) {
+            alert(validation.errors.join('\n'));
+            return;
+        }
+        updateReviewData();
+    }
+    
+    // 현재 활성화된 단계 숨기기
+    const activeStep = document.querySelector('.form-step.active');
+    if (activeStep) {
+        activeStep.classList.remove('active');
+    }
+    
+    // 다음 단계 표시
+    const nextStep = document.getElementById(`step${stepNumber}`);
+    if (nextStep) {
+        nextStep.classList.add('active');
+        
+        // 진행 단계 업데이트
+        updateProgressSteps(stepNumber);
+    }
+}
+
+/**
+ * 이전 단계로 이동
+ */
+function prevStep(stepNumber) {
+    const activeStep = document.querySelector('.form-step.active');
+    if (activeStep) {
+        activeStep.classList.remove('active');
+    }
+    
+    const prevStep = document.getElementById(`step${stepNumber}`);
+    if (prevStep) {
+        prevStep.classList.add('active');
+        updateProgressSteps(stepNumber);
+    }
+}
 
 /**
  * 진행 단계 업데이트
  */
 function updateProgressSteps(currentStep) {
-    const steps = document.querySelectorAll('.step, .progress-step');
+    const steps = document.querySelectorAll('.progress-steps .step');
     
     steps.forEach((step, index) => {
-        if (index + 1 === currentStep) {
-            step.classList.add('active');
-        } else if (index + 1 < currentStep) {
-            step.classList.remove('active');
+        const stepNumber = index + 1;
+        
+        // 모든 단계에서 completed 클래스 제거
+        step.classList.remove('completed');
+        
+        // 현재 단계 이전은 completed로 표시
+        if (stepNumber < currentStep) {
             step.classList.add('completed');
-        } else {
+            step.classList.remove('active');
+        } 
+        // 현재 단계는 active로 표시
+        else if (stepNumber === currentStep) {
+            step.classList.add('active');
+            step.classList.remove('completed');
+        } 
+        // 현재 단계 이후는 기본 상태
+        else {
             step.classList.remove('active', 'completed');
         }
     });
 }
 
 /**
- * 폼 단계 전환
+ * 검토 데이터 업데이트 (Step 3)
  */
-function switchFormStep(currentStepId, nextStepId) {
-    const currentStep = document.getElementById(currentStepId);
-    const nextStep = document.getElementById(nextStepId);
+function updateReviewData() {
+    // 개인정보
+    const firstName = document.getElementById('firstName')?.value || '';
+    const lastName = document.getElementById('lastName')?.value || '';
+    const birthDate = document.getElementById('birthDate')?.value || '';
+    const email = document.getElementById('email')?.value || '';
     
-    if (currentStep) currentStep.classList.remove('active');
-    if (nextStep) nextStep.classList.add('active');
+    if (elementExists('reviewName')) {
+        document.getElementById('reviewName').textContent = `${lastName}, ${firstName}`;
+    }
+    if (elementExists('reviewBirth')) {
+        document.getElementById('reviewBirth').textContent = formatDate(birthDate);
+    }
+    if (elementExists('reviewEmail')) {
+        document.getElementById('reviewEmail').textContent = email;
+    }
     
-    // 진행 상태 업데이트
-    const stepNumber = parseInt(nextStepId.replace('step', ''));
-    updateProgressSteps(stepNumber);
+    // ED 레벨
+    const edLevel = document.getElementById('edLevel')?.value || '';
+    const completionDate = document.getElementById('completionDate')?.value || '';
+    
+    if (edLevel) {
+        const cefrLevel = getCEFRByEdLevel(edLevel);
+        const scores = getScoresByCEFR(cefrLevel);
+        
+        if (elementExists('reviewEdLevel')) {
+            document.getElementById('reviewEdLevel').textContent = edLevel;
+        }
+        if (elementExists('reviewCefrLevel')) {
+            document.getElementById('reviewCefrLevel').textContent = cefrLevel;
+        }
+        if (elementExists('reviewCompletion')) {
+            document.getElementById('reviewCompletion').textContent = formatDate(completionDate);
+        }
+        
+        // 예상 점수
+        if (elementExists('reviewToefl')) {
+            document.getElementById('reviewToefl').textContent = scores.toefl || 'N/A';
+        }
+        if (elementExists('reviewToeic')) {
+            document.getElementById('reviewToeic').textContent = scores.toeic || 'N/A';
+        }
+        if (elementExists('reviewIelts')) {
+            document.getElementById('reviewIelts').textContent = scores.ielts || 'N/A';
+        }
+    }
 }
+
+// ==================== 인증서 발급 함수 ====================
+
+/**
+ * 인증서 발급
+ */
+function issueCertificate() {
+    // 약관 동의 확인
+    const agreeCheckbox = document.getElementById('agreeTerms');
+    if (agreeCheckbox && !agreeCheckbox.checked) {
+        alert('You must agree to the terms before issuing the certificate.');
+        return;
+    }
+    
+    try {
+        // 폼 데이터 수집
+        const formData = collectFormData();
+        
+        // 필수 필드 확인
+        if (!formData.firstName || !formData.lastName || !formData.birthDate || !formData.edLevel) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        // 인증서 생성
+        const certificate = createCertificate(formData);
+        
+        // 로컬스토리지에 저장
+        const success = saveCertificate(certificate);
+        
+        if (success) {
+            // 성공 모달 표시
+            showCertificateSuccess(certificate);
+            
+            // URL에 인증서 데이터 추가
+            const urlData = createCertificateUrl(certificate);
+            history.replaceState(null, '', `?data=${urlData}`);
+        } else {
+            alert('Failed to save certificate. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error issuing certificate:', error);
+        alert('An error occurred while issuing the certificate. Please try again.');
+    }
+}
+
+/**
+ * 인증서 발급 성공 모달 표시
+ */
+function showCertificateSuccess(certificate) {
+    // 모달 요소 가져오기
+    const modal = document.getElementById('successModal');
+    const certIdElement = document.getElementById('issuedCertId');
+    const certUrlElement = document.getElementById('certificateUrl');
+    
+    if (modal && certIdElement && certUrlElement) {
+        // 데이터 설정
+        certIdElement.textContent = certificate.id;
+        certUrlElement.textContent = `https://verify.ed-english.com/${certificate.id}`;
+        
+        // 모달 표시
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+/**
+ * 인증서 보기
+ */
+function viewCertificate() {
+    const certIdElement = document.getElementById('issuedCertId');
+    if (certIdElement) {
+        const certificate = findCertificateById(certIdElement.textContent);
+        if (certificate) {
+            const urlData = encodeURIComponent(JSON.stringify(certificate));
+            window.open(`certificate.html?data=${urlData}`, '_blank');
+        }
+    }
+}
+
+/**
+ * 모달 닫기
+ */
+function closeModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// ==================== UI 관련 함수 ====================
 
 /**
  * 모달 열기
@@ -452,18 +646,7 @@ function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
         modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // 배경 스크롤 막기
-    }
-}
-
-/**
- * 모달 닫기
- */
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = 'hidden';
     }
 }
 
@@ -487,7 +670,8 @@ function initializeCommon() {
         button.addEventListener('click', function() {
             const modal = this.closest('.modal');
             if (modal) {
-                closeModal(modal.id);
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
         });
     });
@@ -496,7 +680,8 @@ function initializeCommon() {
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', function(e) {
             if (e.target === this) {
-                closeModal(this.id);
+                this.style.display = 'none';
+                document.body.style.overflow = 'auto';
             }
         });
     });
@@ -519,7 +704,9 @@ function initializeCommon() {
         completionDateInput.max = today;
         
         // 기본값을 오늘 날짜로 설정
-        completionDateInput.value = today;
+        if (!completionDateInput.value) {
+            completionDateInput.value = today;
+        }
     }
 }
 
@@ -537,29 +724,27 @@ function initializeFormPage() {
                 cefrDisplay.textContent = cefrLevel;
             }
         });
+        
+        // 초기값 설정
+        if (edLevelSelect.value) {
+            const cefrLevel = getCEFRByEdLevel(edLevelSelect.value);
+            const cefrDisplay = document.getElementById('cefrLevelDisplay');
+            if (cefrDisplay) {
+                cefrDisplay.textContent = cefrLevel;
+            }
+        }
     }
     
-    // 다음 버튼 이벤트
-    document.querySelectorAll('.next-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const currentStep = this.closest('.form-step');
-            const nextStepId = currentStep?.getAttribute('data-next');
-            if (nextStepId) {
-                switchFormStep(currentStep.id, nextStepId);
+    // 약관 동의 체크박스 이벤트
+    const agreeCheckbox = document.getElementById('agreeTerms');
+    if (agreeCheckbox) {
+        agreeCheckbox.addEventListener('change', function() {
+            const issueButton = document.querySelector('.issue-btn');
+            if (issueButton) {
+                issueButton.disabled = !this.checked;
             }
         });
-    });
-    
-    // 이전 버튼 이벤트
-    document.querySelectorAll('.prev-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const currentStep = this.closest('.form-step');
-            const prevStepId = currentStep?.getAttribute('data-prev');
-            if (prevStepId) {
-                switchFormStep(currentStep.id, prevStepId);
-            }
-        });
-    });
+    }
 }
 
 // ==================== 페이지 로드 시 실행 ====================
@@ -574,12 +759,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (path.includes('index.html') || path.endsWith('/')) {
         // 메인/폼 페이지
         initializeFormPage();
-    } else if (path.includes('verify.html')) {
-        // 검증 페이지
-        // verify.js에서 처리
-    } else if (path.includes('certificate.html')) {
-        // 인증서 페이지
-        // certificate.js에서 처리
     }
     
     // CSS 애니메이션 추가
@@ -598,13 +777,37 @@ document.addEventListener('DOMContentLoaded', function() {
         .toast-success { background: #38a169; }
         .toast-error { background: #e53e3e; }
         .toast-info { background: #3182ce; }
+        
+        .step.completed .step-number {
+            background: #38a169;
+            color: white;
+        }
+        
+        .step.active .step-number {
+            background: #4c51bf;
+            color: white;
+        }
+        
+        .step .step-number {
+            background: #e2e8f0;
+            color: #a0aec0;
+        }
     `;
     document.head.appendChild(style);
 });
 
 // ==================== 글로벌 함수 내보내기 ====================
 
-// 필요 시 window 객체에 함수 추가
+// 글로벌 함수로 내보내기 (HTML에서 직접 호출하기 위해)
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.issueCertificate = issueCertificate;
+window.viewCertificate = viewCertificate;
+window.closeModal = closeModal;
+window.updateProgressSteps = updateProgressSteps;
+window.updateReviewData = updateReviewData;
+
+// 유틸리티 함수
 window.CommonUtils = {
     formatDate,
     generateCertificateId,
@@ -613,5 +816,7 @@ window.CommonUtils = {
     copyToClipboard,
     showToast,
     saveCertificate,
-    findCertificateById
+    findCertificateById,
+    createCertificate,
+    createCertificateUrl
 };
